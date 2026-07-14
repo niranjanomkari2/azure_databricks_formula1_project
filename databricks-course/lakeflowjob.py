@@ -1,0 +1,257 @@
+# Install Declarative Automation Bundles package locally
+# pip install databricks-bundles==0.275.0
+#
+# copy contents into resources/job_formula1_lakehouse_full_refresh.py
+from databricks.bundles.jobs import Job
+
+
+job_formula1_lakehouse_full_refresh = Job.from_dict(
+    {
+        "name": "job_formula1_lakehouse_full_refresh",
+        "trigger": {
+            "pause_status": "UNPAUSED",
+            "table_update": {
+                "table_names": [
+                    "formula1_catalog.control.batch_events",
+                ],
+            },
+        },
+        "tasks": [
+            {
+                "task_key": "01_Ingest_Circuits_File",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/02-Bronze/01.Ingest Circuits File",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "01_Transform_Circuits_Data",
+                "depends_on": [
+                    {
+                        "task_key": "01_Ingest_Circuits_File",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/03-Silver/01.Transform Circuits Data",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "02_Ingest_Races_File",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/02-Bronze/02. Ingest Races File",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "02_Transform_Races_Data",
+                "depends_on": [
+                    {
+                        "task_key": "02_Ingest_Races_File",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/03-Silver/02.Transform Races Data",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "01_Build_Races_Dimension",
+                "depends_on": [
+                    {
+                        "task_key": "01_Transform_Circuits_Data",
+                    },
+                    {
+                        "task_key": "02_Transform_Races_Data",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/04-Gold/01.Build Races Dimension Table",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "03_Ingest_Constructors_File",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/02-Bronze/03.Ingest Constructor JSON File",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "03_Transform_Constructors_Data",
+                "depends_on": [
+                    {
+                        "task_key": "03_Ingest_Constructors_File",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/03-Silver/03.Transform Constructors Data",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "04_Ingest_Drivers_File",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/02-Bronze/04..Ingest Drivers JSON File",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "04_Transform_Drivers_Data",
+                "depends_on": [
+                    {
+                        "task_key": "04_Ingest_Drivers_File",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/03-Silver/04.Transform Drivers Data",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "05_Ingest_results_File",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/02-Bronze/05.Ingest Results File",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "05_Transform_results_data",
+                "depends_on": [
+                    {
+                        "task_key": "05_Ingest_results_File",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/03-Silver/05.Transform ResultsData",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "06_Ingest_Sprints_File",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/02-Bronze/06.Ingest Sprints File",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "06_Transform_sprints_file",
+                "depends_on": [
+                    {
+                        "task_key": "06_Ingest_Sprints_File",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/03-Silver/06.Transform Sprints Data",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "04_Build_Results_Fact",
+                "depends_on": [
+                    {
+                        "task_key": "05_Transform_results_data",
+                    },
+                    {
+                        "task_key": "06_Transform_sprints_file",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/04-Gold/04.Build Results Fact",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "91_Build_Nationality_Region_Mapping",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/04-Gold/91.Create Nationality Region mapping",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "02_Build_Constructor_Dimension",
+                "depends_on": [
+                    {
+                        "task_key": "03_Transform_Constructors_Data",
+                    },
+                    {
+                        "task_key": "91_Build_Nationality_Region_Mapping",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/04-Gold/02.Build Constructors Dimension",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+            {
+                "task_key": "03_Build_Driver_Dimension",
+                "depends_on": [
+                    {
+                        "task_key": "04_Transform_Drivers_Data",
+                    },
+                    {
+                        "task_key": "91_Build_Nationality_Region_Mapping",
+                    },
+                ],
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/trivenipinninti3@gmail.com/databricks-course/formula1-project/04-Gold/03.Build Drivers Dimension df",
+                    "source": "WORKSPACE",
+                },
+                "job_cluster_key": "Job_cluster",
+            },
+        ],
+        "job_clusters": [
+            {
+                "job_cluster_key": "Job_cluster",
+                "new_cluster": {
+                    "cluster_name": "",
+                    "spark_version": "17.3.x-scala2.13",
+                    "spark_conf": {
+                        "spark.master": "local[*, 4]",
+                        "spark.databricks.cluster.profile": "singleNode",
+                    },
+                    "azure_attributes": {
+                        "first_on_demand": 1,
+                        "availability": "SPOT_WITH_FALLBACK_AZURE",
+                        "spot_bid_max_price": -1,
+                    },
+                    "node_type_id": "Standard_D4pds_v6",
+                    "custom_tags": {
+                        "ResourceClass": "SingleNode",
+                    },
+                    "spark_env_vars": {
+                        "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+                    },
+                    "enable_elastic_disk": True,
+                    "data_security_mode": "SINGLE_USER",
+                    "runtime_engine": "STANDARD",
+                    "num_workers": 0,
+                },
+            },
+        ],
+        "git_source": {
+            "git_url": "https://github.com/niranjanomkari2/azure_databricks_formula1_project.git",
+            "git_provider": "gitHub",
+            "git_branch": "First_Branch",
+        },
+        "queue": {
+            "enabled": True,
+        },
+    }
+)
